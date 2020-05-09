@@ -1,5 +1,5 @@
 let model = {
-    "input": [40, 32, 1],
+    "input": [32, 40, 1],
     "conv2d_1": [4, [3, 3], [1, 1], 1],
     "conv2d_2": [4, [3, 3], [2, 2], 1],
     "conv2d_3": [32, [3, 3], [1, 1], 1],
@@ -9,59 +9,62 @@ let model = {
 }
 
 let multiplier = 1;
+let blockList = [];
+let fontSize = 16;
 
 
-function calculateMultiplier (model)
+function calculateMultiplier (blockList)
 {
-    let minWH = 1e6;
-    let minLayer = "input";
+    let minWH = blockList[0][0] + blockList[0][1];
+    let minBlock = blockList[0];
 
-    for (let layer in model) {
-        if (model[layer][0] + model[layer][1] < minWH) {
-            minWH = model[layer][0] + model[layer][1];
-            minLayer = layer;
+    for (let i = 0; i < blockList.length; i++) {
+        if (blockList[i][0] + blockList[i][1] < minWH) {
+            minWH = blockList[i][0] + blockList[i][1];
+            minBlock = blockList[i];
         }
     }
 
-    return 5 / min(model[minLayer][0], model[minLayer][1]);
+    return 5 / min(minBlock[0], minBlock[1]);
 }
 
 
-function drawCube (x, y, width, height, depth, wText, hText, dText) {
-    let d = depth * 1;
-    let fontSize = 16;
+function drawCube (x, y, width, height, depth, multiplier) {
+    let w = width * multiplier;
+    let h = height * multiplier
+    let d = depth * multiplier;
 
     noFill();
     beginShape();    
     vertex(x, y);
     vertex(x + d, y - d);
-    vertex(x + d + width, y - d);
-    vertex(x + d + width, y - d + height);
-    vertex(x + width, y + height);
-    vertex(x, y + height);
+    vertex(x + d + w, y - d);
+    vertex(x + d + w, y - d + h);
+    vertex(x + w, y + h);
+    vertex(x, y + h);
     endShape(CLOSE);
 
     beginShape();
     vertex(x, y);
-    vertex(x + width, y);
-    vertex(x + width, y + height);
+    vertex(x + w, y);
+    vertex(x + w, y + h);
     endShape();
 
     beginShape();
-    vertex(x + width, y);
-    vertex(x + d + width, y - d);
+    vertex(x + w, y);
+    vertex(x + d + w, y - d);
     endShape();
 
 
     fill(0, 0, 0);
     textSize(fontSize);
     textAlign(CENTER);
-    text(wText, x + (width / 2), y + height + fontSize);
-    text(hText, x - fontSize, y + (height / 2) + fontSize / 2);
+    text(width, x + (w / 2), y + h + fontSize);
+    text(height, x - fontSize, y + (h / 2) + fontSize / 2);
     push();
-    translate(x + width, y + height);
+    translate(x + w, y + h);
     rotate(radians(-45));
-    text(dText, (d / sin(radians(45))) / 2, fontSize);
+    text(depth, (d / sin(radians(45))) / 2, fontSize);
     pop();
 }
 
@@ -76,8 +79,8 @@ function calculateNextLayerDimensions (width, height, depth, layer)
         let strides = model[layer][2];
         let padding = model[layer][3];
 
-        output[0] = floor((height - kernel[0] + 2 * padding) / strides[0]) + 1;
-        output[1] = floor((width - kernel[1] + 2 * padding) / strides[1]) + 1;
+        output[0] = floor((width - kernel[0] + 2 * padding) / strides[0]) + 1;
+        output[1] = floor((height - kernel[1] + 2 * padding) / strides[1]) + 1;
         output[2] = filters;
     }
 
@@ -85,36 +88,38 @@ function calculateNextLayerDimensions (width, height, depth, layer)
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight * 10);  
-  //multiplier = calculateMultiplier(model);
-  multiplier = 5;
+    createCanvas(windowWidth, windowHeight * 10);  
+
+    for (let layer in model) {
+        if (layer == "input") {
+            width = model[layer][0];
+            height = model[layer][1];
+            depth = model[layer][2];            
+        } else {
+            dimensions = calculateNextLayerDimensions(width, height, depth, layer);
+            width = dimensions[0];
+            height = dimensions[1];
+            depth = dimensions[2];
+        }
+
+        append(blockList, [width, height, depth]);
+    }
+
+    multiplier = calculateMultiplier(blockList);
 }
 
 function draw() {
 
     let y = 50;
 
-    let width = 0;
-    let height = 0;
-    let depth = 0;
+    for (let i = 0; i < blockList.length; i++) {
+        drawCube(windowWidth / 2 - (blockList[i][0] + blockList[i][2]) * multiplier / 2, y,
+                 blockList[i][0], blockList[i][1], blockList[i][2], multiplier);
 
-    for (let layer in model) {
-        if (layer == "input") {
-            width = model[layer][1];
-            height = model[layer][0];
-            depth = model[layer][2];            
-        } else {
-            dimensions = calculateNextLayerDimensions(width, height, depth, layer);
-            width = dimensions[1];
-            height = dimensions[0];
-            depth = dimensions[2];
+        y += (blockList[i][1]) * multiplier;
+        if (i + 1 < blockList.length) {
+            y += (blockList[i + 1][2]) * multiplier + fontSize * 2;
         }
-
-        drawCube(windowWidth / 2 - (width * multiplier) / 2, y,
-                 width * multiplier, height * multiplier, depth * multiplier,
-                 width, height, depth);
-
-        y += (height + depth * 2 + 30) * multiplier;
     }
 }
 
