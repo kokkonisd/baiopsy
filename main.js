@@ -9,6 +9,7 @@ let input;
 let inputLabel;
 let btn;
 let readMore;
+let backToTop;
 
 
 /**
@@ -225,6 +226,7 @@ function calculateBlocks (modelData)
     }
 
     resizeCanvas(windowWidth - 23, totalHeight * multiplier + 300 * blockList.length + 300);
+    backToTop.style('opacity', 1);
 }
 
 
@@ -254,6 +256,16 @@ function loadExample ()
 
 
 /**
+ * Scrolls to the top of the page.
+ * @return {None} None
+ */
+function scrollUp ()
+{
+    window.scrollTo(0, 0);
+}
+
+
+/**
  * Setups baiopsy.
  * @return {None} None
  */
@@ -272,6 +284,10 @@ function setup ()
     btn.mousePressed(loadExample);
     // Link to GitHub repo
     readMore = createA("https://github.com/kokkonisd/baiopsy", "read more");
+    // 'Back to top' button
+    backToTop = createButton("back to top");
+    backToTop.mousePressed(scrollUp);
+    backToTop.style('opacity', 0);
     smooth();
 }
 
@@ -359,5 +375,8 @@ function draw ()
     y += 20;
     readMore.position(windowWidth / 2 - 40, y);
     strokeWeight(1);
+
+    // Draw back to top button
+    backToTop.position(windowWidth - 200, windowHeight - 100, 'fixed');
 }
 

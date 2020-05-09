@@ -7,17 +7,8 @@ input {
     opacity: 0;
 }
 
-/*input, button {
-    color: transparent;
-    -moz-appearance: checkmenuitem;
-}
-
-input::-webkit-file-upload-button {
-  visibility: hidden;
-}*/
-
 label::before, button {
-    content: 'Select a Keras JSON file';
+    content: 'select a Keras JSON file';
     color: black;
     display: inline-block;
     background: white;
