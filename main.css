@@ -3,13 +3,20 @@
     src: url("assets/DM_Mono/DMMono-Regular.ttf");
 }
 
-input, button {
-  color: transparent;
+input {
+    opacity: 0;
 }
+
+/*input, button {
+    color: transparent;
+    -moz-appearance: checkmenuitem;
+}
+
 input::-webkit-file-upload-button {
   visibility: hidden;
-}
-input::before, button {
+}*/
+
+label::before, button {
     content: 'Select a Keras JSON file';
     color: black;
     display: inline-block;
@@ -25,12 +32,12 @@ input::before, button {
     font-family: "DM Mono";
 }
 
-input:hover::before, button:hover {
+label:hover::before, button:hover {
     color: white;
     background: black;
 }
 
-input:focus {
+label:focus {
     outline: none;
 }
 

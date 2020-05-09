@@ -6,6 +6,7 @@ let fontRegular;
 let fontItalic;
 let fontBold;
 let input;
+let inputLabel;
 let btn;
 let readMore;
 
@@ -260,9 +261,16 @@ function setup ()
 {
     createCanvas(windowWidth - 23, windowHeight - 23);  
 
+    // File input, will be hidden
     input = createFileInput(handleFile);
+    input.attribute('id', 'file-input');
+    // Label to stylize file input
+    inputLabel = createElement('label', '');
+    inputLabel.attribute('for', 'file-input');
+    // Button to load example
     btn = createButton('load an example');
     btn.mousePressed(loadExample);
+    // Link to GitHub repo
     readMore = createA("https://github.com/kokkonisd/baiopsy", "read more");
     smooth();
 }
@@ -312,7 +320,7 @@ function draw ()
     y += 50;
 
     // Position input & button
-    input.position(windowWidth / 2 - 100, y);
+    inputLabel.position(windowWidth / 2 - 100, y);
     y += 60;
     text("or", windowWidth / 2, y);
     y += 25;
