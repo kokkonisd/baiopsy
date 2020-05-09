@@ -1,3 +1,4 @@
+// Globals
 let multiplier = 1;
 let blockList = [];
 let fontSize = 16;
@@ -6,8 +7,14 @@ let fontItalic;
 let fontBold;
 let input;
 let btn;
+let readMore;
 
 
+/**
+ * Calculates the multiplier needed such that the smallest block is big enough.
+ * @param  {int} blockList The list of blocks to be drawn.
+ * @return {int}           The multiplier.
+ */
 function calculateMultiplier (blockList)
 {
     let minW = blockList[0][0];
@@ -22,6 +29,16 @@ function calculateMultiplier (blockList)
 }
 
 
+/**
+ * Draws a pseudo-3d cube.
+ * @param  {int} x          Horizontal starting point. 
+ * @param  {int} y          Vertical starting point.
+ * @param  {int} width      The width of the cube.
+ * @param  {int} height     The height of the cube.
+ * @param  {int} depth      The depth of the cube.
+ * @param  {int} multiplier The multiplier to resize width, height and depth.
+ * @return {None}           None
+ */
 function drawCube (x, y, width, height, depth, multiplier)
 {
     let w = width * multiplier;
@@ -76,6 +93,37 @@ function drawCube (x, y, width, height, depth, multiplier)
 }
 
 
+/**
+ * Draws a downwards arrow at a given position.
+ * @param  {int} x1 Horizontal starting point.
+ * @param  {int} y1 Vertical starting point.
+ * @param  {int} x2 Horizontal ending point.
+ * @param  {int} y2 Vertical ending point.
+ * @return {None}    None
+ */
+function drawArrow (x1, y1, x2, y2)
+{
+    push();
+    stroke('black');
+    strokeWeight(3);
+    fill('black');
+    line(x1, y1, x2, y2);
+    let arrowSize = 7;
+    triangle(x2 - arrowSize / 2, y2 - arrowSize,
+             x2 + arrowSize / 2, y2 - arrowSize,
+             x2, y2);
+    pop();
+}
+
+
+/**
+ * Calculates the dimensions of the next layer, given its description and the previous dimensions.
+ * @param  {int} width  Previous width.
+ * @param  {int} height Previous height.
+ * @param  {int} depth  Previous depth.
+ * @param  {Object} layer  The next layer.
+ * @return {Array}        The dimensions of the next layer.
+ */
 function calculateNextLayerDimensions (width, height, depth, layer)
 {
     let output = [0, 0, 0];
@@ -139,6 +187,11 @@ function calculateNextLayerDimensions (width, height, depth, layer)
 }
 
 
+/**
+ * Calculates the blocks that should be drawn based on raw model data.
+ * @param  {Object} modelData Model data in JSON form (already parsed).
+ * @return {None}           None
+ */
 function calculateBlocks (modelData)
 {
     console.log(modelData);
@@ -174,6 +227,11 @@ function calculateBlocks (modelData)
 }
 
 
+/**
+ * Handles file input (when the user loads a JSON model file).
+ * @param  {Object} file The file chosen by the user.
+ * @return {None}      None
+ */
 function handleFile (file)
 {
     blockList = [];
@@ -182,6 +240,10 @@ function handleFile (file)
 }
 
 
+/**
+ * Loads an example to demonstrate the use of baiopsy.
+ * @return {None} None
+ */
 function loadExample ()
 {
     blockList = [];
@@ -190,17 +252,35 @@ function loadExample ()
 }
 
 
+/**
+ * Setups baiopsy.
+ * @return {None} None
+ */
 function setup ()
 {
     createCanvas(windowWidth - 23, windowHeight - 23);  
 
     input = createFileInput(handleFile);
     btn = createButton('load an example');
-    btn.mousePressed(loadExample)
+    btn.mousePressed(loadExample);
+    readMore = createA("https://github.com/kokkonisd/baiopsy", "read more");
     smooth();
 }
 
+/**
+ * Handles window resizing.
+ * @return {None} None
+ */
+function windowResized ()
+{
+    resizeCanvas(windowWidth - 23, windowHeight - 23);  
+}
 
+
+/**
+ * Preloads assets.
+ * @return {None} None
+ */
 function preload ()
 {
     fontRegular = loadFont("assets/DM_Mono/DMMono-Regular.ttf");
@@ -209,14 +289,19 @@ function preload ()
 }
 
 
+/**
+ * Draws items on the screen.
+ * @return {None} None
+ */
 function draw ()
 {
+    // Start at a vertical offset of 100
     let y = 100;
 
-    // clear canvas
+    // Clear canvas
     background('white');
     
-    // Title & subtitle
+    // Draw title & subtitle
     textFont(fontRegular);
     textAlign(CENTER);
     textSize(100);
@@ -225,7 +310,8 @@ function draw ()
     textSize(20);
     text("take a peek at your model's inner workings", windowWidth / 2, y);
     y += 50;
-    // Input
+
+    // Position input & button
     input.position(windowWidth / 2 - 100, y);
     y += 60;
     text("or", windowWidth / 2, y);
@@ -262,27 +348,8 @@ function draw ()
     line(0, y, windowWidth, y);
     y += 50;
     text("made by kokkonisd using p5.js", windowWidth / 2, y);
+    y += 20;
+    readMore.position(windowWidth / 2 - 40, y);
     strokeWeight(1);
 }
 
-
-function windowResized ()
-{
-    resizeCanvas(windowWidth - 23, windowHeight - 23);  
-}
-
-
-// draw an arrow for a vector at a given base position
-function drawArrow (x1, y1, x2, y2)
-{
-    push();
-    stroke('black');
-    strokeWeight(3);
-    fill('black');
-    line(x1, y1, x2, y2);
-    let arrowSize = 7;
-    triangle(x2 - arrowSize / 2, y2 - arrowSize,
-             x2 + arrowSize / 2, y2 - arrowSize,
-             x2, y2);
-    pop();
-}

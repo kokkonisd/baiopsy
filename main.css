@@ -33,3 +33,9 @@ input:hover::before, button:hover {
 input:focus {
     outline: none;
 }
+
+
+a {
+    font-family: "DM Mono";
+    color: black;
+}
