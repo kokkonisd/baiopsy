@@ -11,6 +11,7 @@ let showExampleButton;
 let readMoreLink;
 let backToTop;
 let BLOCK_ANGLE = 20;
+let totalHeight = 0;
 
 
 /**
@@ -22,6 +23,7 @@ function calculateMultiplier (blockList)
 {
     let avgW = 0;
     let avgStdDevW = 0;
+    let base = 0;
 
     for (let i = 0; i < blockList.length; i++) {
         avgW += blockList[i][0] + blockList[i][2] * cos(radians(BLOCK_ANGLE));
@@ -35,7 +37,9 @@ function calculateMultiplier (blockList)
 
     avgStdDevW /= blockList.length;
 
-    return windowWidth * 0.5 / abs(avgW - avgStdDevW);
+    base = abs(avgW - avgStdDevW) == 0 ? 1 : abs(avgW - avgStdDevW);
+
+    return windowWidth * 0.5 / base;
 }
 
 
@@ -228,9 +232,9 @@ function calculateBlocks (modelData)
 
     multiplier = calculateMultiplier(blockList);
 
-    let totalHeight = 0;
+    totalHeight = 0;
     for (let i = 0; i < blockList.length; i++) {
-        totalHeight += blockList[i][1] + blockList[i][2];
+        totalHeight += blockList[i][1] + blockList[i][2] * sin(radians(BLOCK_ANGLE));
     }
 
     resizeCanvas(windowWidth - 23, totalHeight * multiplier + 300 * blockList.length + 300);
@@ -303,11 +307,6 @@ function setup ()
     backToTop.mousePressed(scrollUp);
     backToTop.style('opacity', 0);
     smooth();
-
-
-    draw();
-    // Stop draw from looping (this MUST be the last command in this function)
-    noLoop();
 }
 
 /**
@@ -316,7 +315,12 @@ function setup ()
  */
 function windowResized ()
 {
-    resizeCanvas(windowWidth - 23, windowHeight - 23);  
+    if (totalHeight === 0) {
+        resizeCanvas(windowWidth - 23, windowHeight - 23);
+    } else {
+        resizeCanvas(windowWidth - 23, totalHeight * multiplier + 300 * blockList.length + 300);
+    }
+
     draw();
 }
 
