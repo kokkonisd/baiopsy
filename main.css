@@ -38,6 +38,14 @@ a {
     color: black;
 }
 
+
 i {
     font-size: 30px;
+    z-index: 1;
+    cursor: pointer;
+}
+
+
+button {
+    z-index: 2;
 }
