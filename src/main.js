@@ -94,18 +94,30 @@ function draw ()
     // Draw title & subtitle
     textFont(fontRegular);
     textAlign(CENTER);
+    
+    push();
     textSize(100);
     text("baiopsy", width / 2, y);
+    pop();
+    
     y += 50;
+    
+    push();
     textSize(20);
     text("take a peek at your model's inner workings", width / 2, y);
+    pop();
+
     y += 50;
 
     // Position input label & show example button
     inputLabel.position(floor(windowWidth / 2 - (inputLabel.size().width + 1) / 2), y);
     y += 60;
-    textAlign(CENTER);
+
+    push();
+    textSize(20);
     text("or", width / 2, y);
+    pop();
+
     y += 25;
     showExampleButton.position(floor(windowWidth / 2 - (showExampleButton.size().width + 1) / 2), y);
     y += 50
@@ -125,11 +137,13 @@ function draw ()
         }
         
 
+        // Draw arrows and layer names
         if (i + 1 < blockList.length) {
             drawArrow(windowWidth / 2, y, windowWidth / 2, y + 50);
             y += 50;
-            textAlign(CENTER);
+
             text(blockList[i + 1][3], windowWidth / 2, y + fontSize + 10);
+            
             y += fontSize * 2 + 10;
             drawArrow(windowWidth / 2, y, windowWidth / 2, y + 50);
             y += 50;
