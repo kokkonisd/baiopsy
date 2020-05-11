@@ -8,7 +8,7 @@ input {
 }
 
 label::before, button {
-    content: 'select a Keras JSON file';
+    content: 'upload a Keras JSON file';
     color: black;
     display: inline-block;
     background: white;

@@ -19,15 +19,15 @@ let backToTop;
  */
 function calculateMultiplier (blockList)
 {
-    let minW = blockList[0][0];
+    let averageW = 0;
 
     for (let i = 0; i < blockList.length; i++) {
-        if (blockList[i][0] < minW) {
-            minW = blockList[i][0];
-        }
+        averageW += blockList[i][0] + blockList[i][2];
     }
 
-    return windowWidth * 0.05 / minW;
+    averageW /= blockList.length;
+
+    return windowWidth * 0.5 / averageW;
 }
 
 
@@ -280,7 +280,7 @@ function setup ()
     inputLabel = createElement('label', '');
     inputLabel.attribute('for', 'file-input');
     // Button to load example
-    btn = createButton('load an example');
+    btn = createButton('show an example');
     btn.mousePressed(loadExample);
     // Link to GitHub repo
     readMore = createA("https://github.com/kokkonisd/baiopsy", "read more");
