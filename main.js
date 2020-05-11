@@ -235,6 +235,8 @@ function calculateBlocks (modelData)
 
     resizeCanvas(windowWidth - 23, totalHeight * multiplier + 300 * blockList.length + 300);
     backToTop.style('opacity', 1);
+
+    draw();
 }
 
 
@@ -258,6 +260,9 @@ function handleFile (file)
 function loadExample ()
 {
     blockList = [];
+    // Reset input just in case a file has been loaded
+    input.attribute('type', 'text');
+    input.attribute('type', 'file');
 
     loadJSON('model.json', calculateBlocks);
 }
@@ -284,6 +289,7 @@ function setup ()
     // File input, will be hidden
     input = createFileInput(handleFile);
     input.attribute('id', 'file-input');
+    input.attribute('accept', '.json');
     // Label to stylize file input
     inputLabel = createElement('label', '');
     inputLabel.attribute('for', 'file-input');
@@ -297,6 +303,11 @@ function setup ()
     backToTop.mousePressed(scrollUp);
     backToTop.style('opacity', 0);
     smooth();
+
+
+    draw();
+    // Stop draw from looping (this MUST be the last command in this function)
+    noLoop();
 }
 
 /**
@@ -306,6 +317,7 @@ function setup ()
 function windowResized ()
 {
     resizeCanvas(windowWidth - 23, windowHeight - 23);  
+    draw();
 }
 
 
