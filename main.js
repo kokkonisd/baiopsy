@@ -7,9 +7,10 @@ let fontItalic;
 let fontBold;
 let input;
 let inputLabel;
-let btn;
-let readMore;
+let showExampleButton;
+let readMoreLink;
 let backToTop;
+let BLOCK_ANGLE = 20;
 
 
 /**
@@ -19,15 +20,22 @@ let backToTop;
  */
 function calculateMultiplier (blockList)
 {
-    let averageW = 0;
+    let avgW = 0;
+    let avgStdDevW = 0;
 
     for (let i = 0; i < blockList.length; i++) {
-        averageW += blockList[i][0] + blockList[i][2];
+        avgW += blockList[i][0] + blockList[i][2] * cos(radians(BLOCK_ANGLE));
     }
 
-    averageW /= blockList.length;
+    avgW /= blockList.length;
 
-    return windowWidth * 0.5 / averageW;
+    for (let i = 0; i < blockList.length; i++) {
+        avgStdDevW += abs(blockList[i][0] + blockList[i][2] * cos(radians(BLOCK_ANGLE)) - avgW);
+    }
+
+    avgStdDevW /= blockList.length;
+
+    return windowWidth * 0.5 / abs(avgW - avgStdDevW);
 }
 
 
@@ -45,7 +53,8 @@ function drawCube (x, y, width, height, depth, multiplier)
 {
     let w = width * multiplier;
     let h = height * multiplier
-    let d = depth * multiplier;
+    let dx = depth * cos(radians(BLOCK_ANGLE)) * multiplier;
+    let dy = depth * sin(radians(BLOCK_ANGLE)) * multiplier;
 
     if (width === 0 && height === 0 && depth === 0) {
         let w = 10 * multiplier;
@@ -60,9 +69,9 @@ function drawCube (x, y, width, height, depth, multiplier)
     noFill();
     beginShape();    
     vertex(x, y);
-    vertex(x + d, y - d);
-    vertex(x + d + w, y - d);
-    vertex(x + d + w, y - d + h);
+    vertex(x + dx, y - dy);
+    vertex(x + dx + w, y - dy);
+    vertex(x + dx + w, y - dy + h);
     vertex(x + w, y + h);
     vertex(x, y + h);
     endShape(CLOSE);
@@ -75,7 +84,7 @@ function drawCube (x, y, width, height, depth, multiplier)
 
     beginShape();
     vertex(x + w, y);
-    vertex(x + d + w, y - d);
+    vertex(x + dx + w, y - dy);
     endShape();
 
 
@@ -86,8 +95,8 @@ function drawCube (x, y, width, height, depth, multiplier)
     text(height, x - fontSize, y + (h / 2) + fontSize / 2);
     push();
     translate(x + w, y + h);
-    rotate(radians(-45));
-    text(depth, (d / sin(radians(45))) / 2, fontSize);
+    rotate(radians(-BLOCK_ANGLE));
+    text(depth, depth * multiplier / 2, fontSize);
     pop();
 
     text('(' + width + ', ' + height + ', ' + depth + ')',
@@ -196,7 +205,6 @@ function calculateNextLayerDimensions (width, height, depth, layer)
  */
 function calculateBlocks (modelData)
 {
-    console.log(modelData);
     let width = 0;
     let height = 0;
     let depth = 0;
@@ -280,10 +288,10 @@ function setup ()
     inputLabel = createElement('label', '');
     inputLabel.attribute('for', 'file-input');
     // Button to load example
-    btn = createButton('show an example');
-    btn.mousePressed(loadExample);
+    showExampleButton = createButton('show an example');
+    showExampleButton.mousePressed(loadExample);
     // Link to GitHub repo
-    readMore = createA("https://github.com/kokkonisd/baiopsy", "read more");
+    readMoreLink = createA("https://github.com/kokkonisd/baiopsy", "read more");
     // 'Back to top' button
     backToTop = createButton("back to top");
     backToTop.mousePressed(scrollUp);
@@ -329,18 +337,19 @@ function draw ()
     textFont(fontRegular);
     textAlign(CENTER);
     textSize(100);
-    text("baiopsy", windowWidth / 2, y);
+    text("baiopsy", width / 2, y);
     y += 50;
     textSize(20);
-    text("take a peek at your model's inner workings", windowWidth / 2, y);
+    text("take a peek at your model's inner workings", width / 2, y);
     y += 50;
 
-    // Position input & button
-    inputLabel.position(windowWidth / 2 - 100, y);
+    // Position input label & show example button
+    inputLabel.position(floor(windowWidth / 2 - (inputLabel.size().width + 1) / 2), y);
     y += 60;
-    text("or", windowWidth / 2, y);
+    textAlign(CENTER);
+    text("or", width / 2, y);
     y += 25;
-    btn.position(windowWidth / 2 - 60, y);
+    showExampleButton.position(floor(windowWidth / 2 - (showExampleButton.size().width + 1) / 2), y);
     y += 50
 
     // Draw model
@@ -362,7 +371,7 @@ function draw ()
         }
 
         if (i + 1 < blockList.length) {
-            y += (blockList[i + 1][2]) * multiplier + fontSize * 2;
+            y += (blockList[i + 1][2]) * sin(radians(BLOCK_ANGLE)) * multiplier + fontSize * 2;
         }
     }
 
@@ -371,9 +380,9 @@ function draw ()
     strokeWeight(5);
     line(0, y, windowWidth, y);
     y += 50;
-    text("made by kokkonisd using p5.js", windowWidth / 2, y);
+    text("made by kokkonisd using p5.js", width / 2, y);
     y += 20;
-    readMore.position(windowWidth / 2 - 40, y);
+    readMoreLink.position(width / 2 - 40, y);
     strokeWeight(1);
 
     // Draw back to top button
